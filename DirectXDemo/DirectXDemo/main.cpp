@@ -1,4 +1,4 @@
-#include  <Windows.h>
+//#include  <Windows.h>
 #include <d3d9.h>
 
 #pragma comment(lib,"d3d9.lib");
@@ -11,10 +11,23 @@
 
 LPDIRECT3D9 g_D3D = NULL;
 LPDIRECT3DDEVICE9 g_D3DDevice = NULL;
+LPDIRECT3DVERTEXBUFFER9 g_VertexBuffer = NULL;
+
 
 bool InitializeD3D(HWND hWnd);
+bool InitializeObjects();
 void RenderScene();
 void Shutdown();
+
+struct stD3DVertex 
+{
+	float x, y, z, rhw;
+	unsigned long color;
+
+};
+
+#define D3DFVF_VERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE)
+
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -93,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hInst,
 			else 
 			{
 				//没有消息要处理，就可以做其他的一些工作
-				//RenderScene();		//渲染场景
+				RenderScene();		//渲染场景
 			}
 	
 		}
@@ -127,6 +140,9 @@ bool InitializeD3D(HWND hWnd)
 		return false;
 	}
 
+	if (!InitializeObjects())
+		return false;
+
 	return true;
 }
 
@@ -137,6 +153,11 @@ void Shutdown()
 		g_D3DDevice->Release();
 	if (g_D3D != NULL)
 		g_D3D->Release();
+	if (g_VertexBuffer)g_VertexBuffer->Release();
+
+	g_D3DDevice = NULL;
+	g_D3D = NULL;
+	g_VertexBuffer = NULL;
 }
 
 
@@ -146,8 +167,48 @@ void RenderScene()
 	g_D3DDevice->BeginScene();
 
 	//输出3d图形
+	g_D3DDevice->SetStreamSource(0, g_VertexBuffer,0,sizeof(stD3DVertex));
+
+	g_D3DDevice->SetFVF(D3DFVF_VERTEX);
+	//绘制两条线
+	//g_D3DDevice->DrawPrimitive(D3DPT_LINELIST,0,2);
+	//绘制两个点
+	//g_D3DDevice->DrawPrimitive(D3DPT_POINTLIST, 0, 2);
+
+	//将点连接起来的线(线带)
+	g_D3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, 2);
 
 	g_D3DDevice->EndScene();
 
 	g_D3DDevice->Present(NULL,NULL,NULL,NULL);
+}
+
+
+bool InitializeObjects()
+{
+	unsigned long col = D3DCOLOR_XRGB(255, 255, 255);
+
+	stD3DVertex objData[] =
+	{
+		{420.0f,150.0f,0.5f,1.0f,col,},
+		{420.0f,350.0f,0.5f,1.0f,col,},
+		{220.0f,150.0f,0.5f,1.0f,col,},
+		{220.0f,350.0f,0.5f,1.0f,col,},
+	};
+
+	if (FAILED(g_D3DDevice->CreateVertexBuffer(sizeof(objData), 0, D3DFVF_VERTEX, D3DPOOL_DEFAULT, &g_VertexBuffer, NULL)))
+	{
+		return false;
+	}
+
+
+	void *ptr;
+
+	if (FAILED(g_VertexBuffer->Lock(0, sizeof(objData), (void**)&ptr, 0)))
+		return false;
+
+	memcpy(ptr, objData,sizeof(objData));
+
+	g_VertexBuffer->Unlock();
+	return true;
 }

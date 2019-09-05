@@ -1,1 +1,4 @@
-﻿  DirectXDemo.vcxproj -> F:\WorkSpace\CPlusPlus\DirectX\DirectXDemo\Debug\DirectXDemo.exe
+﻿  main.cpp
+f:\workspace\cplusplus\directx\directxdemo\directxdemo\main.cpp(4): warning C4081: 应输入“newline”；找到“;”
+f:\workspace\cplusplus\directx\directxdemo\directxdemo\main.cpp(5): warning C4081: 应输入“newline”；找到“;”
+  DirectXDemo.vcxproj -> F:\WorkSpace\CPlusPlus\DirectX\DirectXDemo\Debug\DirectXDemo.exe
