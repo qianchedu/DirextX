@@ -176,7 +176,13 @@ void RenderScene()
 	//g_D3DDevice->DrawPrimitive(D3DPT_POINTLIST, 0, 2);
 
 	//将点连接起来的线(线带)
-	g_D3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, 2);
+	//g_D3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, 2);
+
+	//绘制三角形
+	//g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+
+	//绘制矩形
+	g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
 	g_D3DDevice->EndScene();
 
@@ -188,6 +194,7 @@ bool InitializeObjects()
 {
 	unsigned long col = D3DCOLOR_XRGB(255, 255, 255);
 
+	//线
 	stD3DVertex objData[] =
 	{
 		{420.0f,150.0f,0.5f,1.0f,col,},
@@ -195,6 +202,13 @@ bool InitializeObjects()
 		{220.0f,150.0f,0.5f,1.0f,col,},
 		{220.0f,350.0f,0.5f,1.0f,col,},
 	};
+
+	//stD3DVertex objData[] =
+	//{
+	//	{320.0f,150.0f,0,1,col,},
+	//	{320.0f,350.0f,0,1,col,},
+	//	{220.0f,350.0f,0,1,col,},
+	//};
 
 	if (FAILED(g_D3DDevice->CreateVertexBuffer(sizeof(objData), 0, D3DFVF_VERTEX, D3DPOOL_DEFAULT, &g_VertexBuffer, NULL)))
 	{
