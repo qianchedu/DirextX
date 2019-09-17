@@ -16,8 +16,15 @@
 LPDIRECT3D9 g_D3D = NULL;
 LPDIRECT3DDEVICE9 g_D3DDevice = NULL;
 //矩阵
-D3DXMATRIX g_ortho;
+//D3DXMATRIX g_ortho;
+//D3DXMATRIX g_projection;
+
 D3DXMATRIX g_projection;
+D3DXMATRIX g_ViewMatrix;
+//D3DXMATRIX g_translation;
+//D3DXMATRIX g_rotation;
+
+float g_angle = 0.0f;
 
 LPDIRECT3DVERTEXBUFFER9 g_VertexBuffer = NULL;
 
@@ -175,23 +182,29 @@ void RenderScene()
 	g_D3DDevice->Clear(0,NULL,D3DCLEAR_TARGET,D3DCOLOR_XRGB(0,0,0),1.0f,0);
 	g_D3DDevice->BeginScene();
 
+	g_D3DDevice->SetTransform(D3DTS_VIEW, &g_ViewMatrix);
+
+	////创建一个矩阵
+	//D3DXMatrixTranslation(&g_translation,0.0f,0.0f,3.0f);
+	////沿着中心轴的Y轴旋转
+	//D3DXMatrixRotationY(&g_rotation, g_angle);
+	//g_D3DDevice->SetTransform(D3DTS_WORLD, &g_worldMatrix);
+
+	//g_worldMatrix = g_rotation * g_translation;
+
+	//g_angle += 0.01f;
+
+	//if (g_angle >= 360) g_angle = 0.0f;
+
+
 	//输出3d图形
 	g_D3DDevice->SetStreamSource(0, g_VertexBuffer,0,sizeof(stD3DVertex));
 
 	g_D3DDevice->SetFVF(D3DFVF_VERTEX);
-	//绘制两条线
-	//g_D3DDevice->DrawPrimitive(D3DPT_LINELIST,0,2);
-	//绘制两个点
-	//g_D3DDevice->DrawPrimitive(D3DPT_POINTLIST, 0, 2);
 
-	//将点连接起来的线(线带)
-	//g_D3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, 2);
-
-	//绘制三角形
 	g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
-	//绘制矩形
-	//g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	
 
 	g_D3DDevice->EndScene();
 
@@ -209,39 +222,26 @@ bool InitializeObjects()
 
 	g_D3DDevice->SetTransform(D3DTS_PROJECTION, &g_projection);
 
+	D3DXVECTOR3 cameraPos(0.0f, 0.0f, -5.0f);
+	D3DXVECTOR3 lookAtPos(0.0f, 0.0f,0.0f);
+	D3DXVECTOR3 upDir(0.0f,1.0f,0.0f);
+
+	D3DXMatrixLookAtLH(&g_ViewMatrix, &cameraPos, &lookAtPos, &upDir);
+
+
+
 	g_D3DDevice->SetRenderState(D3DRS_LIGHTING,FALSE);
 	g_D3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
 
 	unsigned long col = D3DCOLOR_XRGB(255, 255, 255);
 
-	//线
-	//stD3DVertex objData[] =
-	//{
-	//	{420.0f,150.0f,0.5f,1.0f,col,},
-	//	{420.0f,350.0f,0.5f,1.0f,col,},
-	//	{220.0f,150.0f,0.5f,1.0f,col,},
-	//	{220.0f,350.0f,0.5f,1.0f,col,},
-	//};
-
-	//stD3DVertex objData[] =
-	//{
-	//	{320.0f,150.0f,0,1,col,},
-	//	{320.0f,350.0f,0,1,col,},
-	//	{220.0f,350.0f,0,1,col,},
-	//};
-
-	//stD3DVertex objData[] = 
-	//{
-	//	{-150.0f,-150.0f,0.1f,1,D3DCOLOR_XRGB(255,255,0)},
-	//	{ 150.0f,-150.0f,0.1f,1,D3DCOLOR_XRGB(255,0,  0)},
-	//	{   0.0f, 150.0f,0.1f,1,D3DCOLOR_XRGB(0,  0,255)},
-	//};
+	
 
 	stD3DVertex objData[] =
 	{
-		{ -0.3f,-0.3f,1.0f,D3DCOLOR_XRGB(255,255,0)},
-		{  0.3f,-0.3f,1.0f,D3DCOLOR_XRGB(255,0,  0)},
-		{  0.0f, 0.3f,1.0f,D3DCOLOR_XRGB(0,  0,255)},
+		{ -0.3f,-0.3f,0.0f,D3DCOLOR_XRGB(255,255,0)},
+		{  0.3f,-0.3f,0.0f,D3DCOLOR_XRGB(255,0,  0)},
+		{  0.0f, 0.3f,0.0f,D3DCOLOR_XRGB(0,  0,255)},
 	};
 
 
