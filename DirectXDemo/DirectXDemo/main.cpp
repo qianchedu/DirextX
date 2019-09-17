@@ -1,16 +1,24 @@
 //#include  <Windows.h>
 #include <d3d9.h>
+#include <d3dx9.h>
 
 #pragma comment(lib,"d3d9.lib");
 #pragma comment(lib,"d3dx9.lib");
 
-#define WINDOW_CLASS "UGPDX"
-#define WINDOW_TITLE "Deme window"
+#define WINDOW_CLASS    "UGPDX"
+#define WINDOW_TITLE    "Deme window"
+#define WINDOW_WIDTH    640
+#define WINDOW_HEIGHT   480
+
 
 
 
 LPDIRECT3D9 g_D3D = NULL;
 LPDIRECT3DDEVICE9 g_D3DDevice = NULL;
+//矩阵
+D3DXMATRIX g_ortho;
+D3DXMATRIX g_projection;
+
 LPDIRECT3DVERTEXBUFFER9 g_VertexBuffer = NULL;
 
 
@@ -21,12 +29,13 @@ void Shutdown();
 
 struct stD3DVertex 
 {
-	float x, y, z, rhw;
+	//float x, y, z, rhw;
+	float x, y, z;
 	unsigned long color;
 
 };
 
-#define D3DFVF_VERTEX (D3DFVF_XYZRHW|D3DFVF_DIFFUSE)
+#define D3DFVF_VERTEX (D3DFVF_XYZ|D3DFVF_DIFFUSE)
 
 
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -81,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInst,
 	RegisterClassEx(&wc);
 
 	HWND hWnd = CreateWindow(WINDOW_CLASS, WINDOW_TITLE,WS_OVERLAPPEDWINDOW,
-		100,100,640,480,GetDesktopWindow(),NULL,hInst,NULL);
+		100,100,WINDOW_WIDTH,WINDOW_HEIGHT,GetDesktopWindow(),NULL,hInst,NULL);
 
 
 	if (InitializeD3D(hWnd))
@@ -179,10 +188,10 @@ void RenderScene()
 	//g_D3DDevice->DrawPrimitive(D3DPT_LINESTRIP, 0, 2);
 
 	//绘制三角形
-	//g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
+	g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1);
 
 	//绘制矩形
-	g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+	//g_D3DDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 
 	g_D3DDevice->EndScene();
 
@@ -192,16 +201,27 @@ void RenderScene()
 
 bool InitializeObjects()
 {
+
+
+	//创建一个左手坐标系正交投影矩阵。
+	//D3DXMatrixOrthoLH(&g_ortho,WINDOW_WIDTH,WINDOW_HEIGHT,0.1f,1);
+	D3DXMatrixPerspectiveFovLH(&g_projection,45.0f,WINDOW_WIDTH/WINDOW_HEIGHT,0.1f,1000);
+
+	g_D3DDevice->SetTransform(D3DTS_PROJECTION, &g_projection);
+
+	g_D3DDevice->SetRenderState(D3DRS_LIGHTING,FALSE);
+	g_D3DDevice->SetRenderState(D3DRS_CULLMODE,D3DCULL_NONE);
+
 	unsigned long col = D3DCOLOR_XRGB(255, 255, 255);
 
 	//线
-	stD3DVertex objData[] =
-	{
-		{420.0f,150.0f,0.5f,1.0f,col,},
-		{420.0f,350.0f,0.5f,1.0f,col,},
-		{220.0f,150.0f,0.5f,1.0f,col,},
-		{220.0f,350.0f,0.5f,1.0f,col,},
-	};
+	//stD3DVertex objData[] =
+	//{
+	//	{420.0f,150.0f,0.5f,1.0f,col,},
+	//	{420.0f,350.0f,0.5f,1.0f,col,},
+	//	{220.0f,150.0f,0.5f,1.0f,col,},
+	//	{220.0f,350.0f,0.5f,1.0f,col,},
+	//};
 
 	//stD3DVertex objData[] =
 	//{
@@ -209,6 +229,23 @@ bool InitializeObjects()
 	//	{320.0f,350.0f,0,1,col,},
 	//	{220.0f,350.0f,0,1,col,},
 	//};
+
+	//stD3DVertex objData[] = 
+	//{
+	//	{-150.0f,-150.0f,0.1f,1,D3DCOLOR_XRGB(255,255,0)},
+	//	{ 150.0f,-150.0f,0.1f,1,D3DCOLOR_XRGB(255,0,  0)},
+	//	{   0.0f, 150.0f,0.1f,1,D3DCOLOR_XRGB(0,  0,255)},
+	//};
+
+	stD3DVertex objData[] =
+	{
+		{ -0.3f,-0.3f,1.0f,D3DCOLOR_XRGB(255,255,0)},
+		{  0.3f,-0.3f,1.0f,D3DCOLOR_XRGB(255,0,  0)},
+		{  0.0f, 0.3f,1.0f,D3DCOLOR_XRGB(0,  0,255)},
+	};
+
+
+
 
 	if (FAILED(g_D3DDevice->CreateVertexBuffer(sizeof(objData), 0, D3DFVF_VERTEX, D3DPOOL_DEFAULT, &g_VertexBuffer, NULL)))
 	{
